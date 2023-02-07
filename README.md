@@ -227,6 +227,8 @@ git checkout NGSI-v2
 ./services start
 ```
 
+<better explain what is in the ./services script>
+
 This command will also import seed data from the previous
 [Store Finder tutorial](https://github.com/FIWARE/tutorials.Entity-Relationships) on startup.
 
@@ -322,7 +324,7 @@ operation fails.
 
 ### Create a New Data Entity
 
-This example adds a new **Product** entity ("Lemonade" at 99 cents) to the context.
+This example adds a new **Product** entity ("Citronade" at 1.99 dirhams) to the context.
 
 #### :one: Request:
 
@@ -332,9 +334,9 @@ curl -iX POST \
   --header 'Content-Type: application/json' \
   --data ' {
       "id":"urn:ngsi-ld:Product:010", "type":"Product",
-      "name":{"type":"Text", "value":"Lemonade"},
+      "name":{"type":"Text", "value":"Citronade"},
       "size":{"type":"Text", "value": "S"},
-      "price":{"type":"Integer", "value": 99}
+      "price":{"type":"Integer", "value": 1.99}
 }'
 ```
 
@@ -348,7 +350,7 @@ You can check to see if the new **Product** can be found in the context by makin
 
 ```console
 curl -X GET \
-  --url 'http://localhost:1026/v2/entities/urn:ngsi-ld:Product:010?type=Product'
+  --url 'http://localhost:1026/v2/entities/urn:ngsi-ld:Product:010?type=Product'|jq
 ```
 
 ### Create a New Attribute
@@ -387,8 +389,7 @@ As you can see there is now a boolean `specialOffer` flag attached to the "Beer"
 
 ### Batch Create New Data Entities or Attributes
 
-This example uses the convenience batch processing endpoint to add two new **Product** entities and one new attribute
-(`offerPrice`) to the context.
+This example uses the convenience batch processing endpoint to add two new **Product** entities and one new attribute (`offerPrice`) to the context.
 
 #### :five: Request:
 
@@ -401,19 +402,19 @@ curl -iX POST \
   "entities":[
     {
       "id":"urn:ngsi-ld:Product:011", "type":"Product",
-      "name":{"type":"Text", "value":"Brandy"},
+      "name":{"type":"Text", "value":"Boisson au Chocolat"},
       "size":{"type":"Text", "value": "M"},
-      "price":{"type":"Integer", "value": 1199}
+      "price":{"type":"Integer", "value": 1.99}
     },
     {
       "id":"urn:ngsi-ld:Product:012", "type":"Product",
-      "name":{"type":"Text", "value":"Port"},
+      "name":{"type":"Text", "value":"Boisson au lait a la vanille"},
       "size":{"type":"Text", "value": "M"},
-      "price":{"type":"Integer", "value": 1099}
+      "price":{"type":"Integer", "value": 2.90}
     },
     {
       "id":"urn:ngsi-ld:Product:001", "type":"Product",
-      "offerPrice":{"type":"Integer", "value": 89}
+      "offerPrice":{"type":"Integer", "value": 0.89}
     }
   ]
 }'
@@ -448,15 +449,15 @@ curl -iX POST \
   "entities":[
     {
       "id":"urn:ngsi-ld:Product:011", "type":"Product",
-      "name":{"type":"Text", "value":"Brandy"},
+      "name":{"type":"Text", "value":"Boisson au Chocolat"},
       "size":{"type":"Text", "value": "M"},
-      "price":{"type":"Integer", "value": 1199}
+      "price":{"type":"Integer", "value": 1.99}
     },
     {
       "id":"urn:ngsi-ld:Product:012", "type":"Product",
-      "name":{"type":"Text", "value":"Port"},
+      "name":{"type":"Text", "value":"Boisson au lait a la vanille"},
       "size":{"type":"Text", "value": "M"},
-      "price":{"type":"Integer", "value": 1099}
+      "price":{"type":"Integer", "value": 2.90}
     }
   ]
 }'
@@ -488,7 +489,7 @@ This example reads the full context from an existing **Product** entity with a k
 
 ```console
 curl -X GET \
-  --url 'http://localhost:1026/v2/entities/urn:ngsi-ld:Product:010?type=Product'
+  --url 'http://localhost:1026/v2/entities/urn:ngsi-ld:Product:010?type=Product'|jq
 ```
 
 #### Response:
@@ -497,11 +498,23 @@ Product `urn:ngsi-ld:Product:010` is "Lemonade" at 99 cents. The response is sho
 
 ```json
 {
-    "id": "urn:ngsi-ld:Product:010",
-    "type": "Product",
-    "name": { "type": "Text", "value": "Lemonade", "metadata": {} },
-    "price": { "type": "Integer", "value": 99, "metadata": {} },
-    "size": { "type": "Text", "value": "S", "metadata": {} }
+  "id": "urn:ngsi-ld:Product:010",
+  "type": "Product",
+  "name": {
+    "type": "Text",
+    "value": "Citronade",
+    "metadata": {}
+  },
+  "price": {
+    "type": "Integer",
+    "value": 1.99,
+    "metadata": {}
+  },
+  "size": {
+    "type": "Text",
+    "value": "S",
+    "metadata": {}
+  }
 }
 ```
 
@@ -515,15 +528,15 @@ This example reads the value of a single attribute (`name`) from an existing **P
 
 ```console
 curl -X GET \
-  --url 'http://localhost:1026/v2/entities/urn:ngsi-ld:Product:001/attrs/name/value'
+  --url 'http://localhost:1026/v2/entities/urn:ngsi-ld:Product:001/attrs/name/value'|jq
 ```
 
 #### Response:
 
-Product `urn:ngsi-ld:Product:001` is "Beer" at 99 cents. The response is shown below:
+Product `urn:ngsi-ld:Product:001` is "Jus Orange" at 1.99 Dirham. The response is shown below:
 
 ```json
-"Beer"
+"Jus Orange"
 ```
 
 Context data can be retrieved by making a GET request to the `/v2/entities/<entity>/attrs/<attribute>/value` endpoint.
@@ -537,19 +550,19 @@ entities with a known `id`.
 
 ```console
 curl -X GET \
-  --url 'http://localhost:1026/v2/entities/urn:ngsi-ld:Product:001?type=Product&options=keyValues&attrs=name,price'
+  --url 'http://localhost:1026/v2/entities/urn:ngsi-ld:Product:001?type=Product&options=keyValues&attrs=name,price'|jq
 ```
 
 #### Response:
 
-Product `urn:ngsi-ld:Product:001` is "Beer" at 99 cents. The response is shown below:
+Product `urn:ngsi-ld:Product:001` is "Jus Orange" at 1.99 Dirham. The response is shown below:
 
 ```json
 {
     "id": "urn:ngsi-ld:Product:001",
     "type": "Product",
-    "name": "Beer",
-    "price": 99
+    "name": "Jus Orange",
+    "price": 1.99
 }
 ```
 
@@ -585,7 +598,7 @@ This example lists the full context of all **Product** entities.
 
 ```console
 curl -X GET \
-  --url 'http://localhost:1026/v2/entities?type=Product'
+  --url 'http://localhost:1026/v2/entities?type=Product'|jq
 ```
 
 ### Response:
@@ -594,93 +607,74 @@ On start-up the context held nine products, three more have been added by create
 contain twelve products.
 
 ```json
+
 [
-    {
-        "id": "urn:ngsi-ld:Product:001",
-        "type": "Product",
-        "name": { "type": "Text", "value": "Beer", "metadata": {} },
-        "offerPrice": { "type": "Integer", "value": 89, "metadata": {} },
-        "price": { "type": "Integer", "value": 99, "metadata": {} },
-        "size": { "type": "Text", "value": "S", "metadata": {} },
-        "specialOffer": { "type": "Boolean", "value": true, "metadata": {} }
+  {
+    "id": "urn:ngsi-ld:Product:010",
+    "type": "Product",
+    "name": {
+      "type": "Text",
+      "value": "Citronade",
+      "metadata": {}
     },
-    {
-        "id": "urn:ngsi-ld:Product:002",
-        "type": "Product",
-        "name": { "type": "Text", "value": "Red Wine", "metadata": {} },
-        "price": { "type": "Integer", "value": 1099, "metadata": {} },
-        "size": { "type": "Text", "value": "M", "metadata": {} }
+    "price": {
+      "type": "Integer",
+      "value": 1.99,
+      "metadata": {}
     },
-    {
-        "id": "urn:ngsi-ld:Product:003",
-        "type": "Product",
-        "name": { "type": "Text", "value": "White Wine", "metadata": {} },
-        "price": { "type": "Integer", "value": 1499, "metadata": {} },
-        "size": { "type": "Text", "value": "M", "metadata": {} }
-    },
-    {
-        "id": "urn:ngsi-ld:Product:004",
-        "type": "Product",
-        "name": { "type": "Text", "value": "Vodka", "metadata": {} },
-        "price": { "type": "Integer", "value": 5000, "metadata": {} },
-        "size": { "type": "Text", "value": "XL", "metadata": {} }
-    },
-    {
-        "id": "urn:ngsi-ld:Product:005",
-        "type": "Product",
-        "name": { "type": "Text", "value": "Lager", "metadata": {} },
-        "price": { "type": "Integer", "value": 99, "metadata": {} },
-        "size": { "type": "Text", "value": "S", "metadata": {} }
-    },
-    {
-        "id": "urn:ngsi-ld:Product:006",
-        "type": "Product",
-        "name": { "type": "Text", "value": "Whisky", "metadata": {} },
-        "price": { "type": "Integer", "value": 99, "metadata": {} },
-        "size": { "type": "Text", "value": "S", "metadata": {} }
-    },
-    {
-        "id": "urn:ngsi-ld:Product:007",
-        "type": "Product",
-        "name": { "type": "Text", "value": "Gin", "metadata": {} },
-        "price": { "type": "Integer", "value": 99, "metadata": {} },
-        "size": { "type": "Text", "value": "S", "metadata": {} }
-    },
-    {
-        "id": "urn:ngsi-ld:Product:008",
-        "type": "Product",
-        "name": { "type": "Text", "value": "Apple Juice", "metadata": {} },
-        "price": { "type": "Integer", "value": 99, "metadata": {} },
-        "size": { "type": "Text", "value": "S", "metadata": {} }
-    },
-    {
-        "id": "urn:ngsi-ld:Product:009",
-        "type": "Product",
-        "name": { "type": "Text", "value": "Orange Juice", "metadata": {} },
-        "price": { "type": "Integer", "value": 99, "metadata": {} },
-        "size": { "type": "Text", "value": "S", "metadata": {} }
-    },
-    {
-        "id": "urn:ngsi-ld:Product:010",
-        "type": "Product",
-        "name": { "type": "Text", "value": "Lemonade", "metadata": {} },
-        "price": { "type": "Integer", "value": 99, "metadata": {} },
-        "size": { "type": "Text", "value": "S", "metadata": {} }
-    },
-    {
-        "id": "urn:ngsi-ld:Product:011",
-        "type": "Product",
-        "name": { "type": "Text", "value": "Brandy", "metadata": {} },
-        "price": { "type": "Integer", "value": 1199, "metadata": {} },
-        "size": { "type": "Text", "value": "M", "metadata": {} }
-    },
-    {
-        "id": "urn:ngsi-ld:Product:012",
-        "type": "Product",
-        "name": { "type": "Text", "value": "Port", "metadata": {} },
-        "price": { "type": "Integer", "value": 1099, "metadata": {} },
-        "size": { "type": "Text", "value": "M", "metadata": {} }
+    "size": {
+      "type": "Text",
+      "value": "S",
+      "metadata": {}
     }
+  },
+  {
+    "id": "urn:ngsi-ld:Product:011",
+    "type": "Product",
+    "name": {
+      "type": "Text",
+      "value": "Boisson au Chocolat",
+      "metadata": {}
+    },
+    "price": {
+      "type": "Integer",
+      "value": 1.99,
+      "metadata": {}
+    },
+    "size": {
+      "type": "Text",
+      "value": "M",
+      "metadata": {}
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Product:012",
+    "type": "Product",
+    "name": {
+      "type": "Text",
+      "value": "Boisson au lait a la vanille",
+      "metadata": {}
+    },
+    "price": {
+      "type": "Integer",
+      "value": 2.9,
+      "metadata": {}
+    },
+    "size": {
+      "type": "Text",
+      "value": "M",
+      "metadata": {}
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Product:001",
+    "type": "Product",
+    "offerPrice": {
+      "type": "Integer",
+      "value": 0.89,
+      "metadata": {}
+    }
+  }
 ]
 ```
 
@@ -692,7 +686,7 @@ This example lists the `name` and `price` attributes of all **Product** entities
 
 ```console
 curl -X GET \
-  --url 'http://localhost:1026/v2/entities/?type=Product&options=keyValues&attrs=name,price'
+  --url 'http://localhost:1026/v2/entities/?type=Product&options=keyValues&attrs=name,price'|jq
 ```
 
 #### Response:
@@ -701,85 +695,35 @@ On start-up the context held nine products, three more have been added by create
 contain twelve products.
 
 ```json
+
 [
-    {
-        "id": "urn:ngsi-ld:Product:001",
-        "type": "Product",
-        "name": "Beer",
-        "price": 99
-    },
-    {
-        "id": "urn:ngsi-ld:Product:002",
-        "type": "Product",
-        "name": "Red Wine",
-        "price": 1099
-    },
-    {
-        "id": "urn:ngsi-ld:Product:003",
-        "type": "Product",
-        "name": "White Wine",
-        "price": 1499
-    },
-    {
-        "id": "urn:ngsi-ld:Product:004",
-        "type": "Product",
-        "name": "Vodka",
-        "price": 5000
-    },
-    {
-        "id": "urn:ngsi-ld:Product:005",
-        "type": "Product",
-        "name": "Lager",
-        "price": 99
-    },
-    {
-        "id": "urn:ngsi-ld:Product:006",
-        "type": "Product",
-        "name": "Whisky",
-        "price": 99
-    },
-    {
-        "id": "urn:ngsi-ld:Product:007",
-        "type": "Product",
-        "name": "Gin",
-        "price": 99
-    },
-    {
-        "id": "urn:ngsi-ld:Product:008",
-        "type": "Product",
-        "name": "Apple Juice",
-        "price": 99
-    },
-    {
-        "id": "urn:ngsi-ld:Product:009",
-        "type": "Product",
-        "name": "Orange Juice",
-        "price": 99
-    },
-    {
-        "id": "urn:ngsi-ld:Product:010",
-        "type": "Product",
-        "name": "Lemonade",
-        "price": 99
-    },
-    {
-        "id": "urn:ngsi-ld:Product:011",
-        "type": "Product",
-        "name": "Brandy",
-        "price": 1199
-    },
-    {
-        "id": "urn:ngsi-ld:Product:012",
-        "type": "Product",
-        "name": "Port",
-        "price": 1099
-    }
+  {
+    "id": "urn:ngsi-ld:Product:010",
+    "type": "Product",
+    "name": "Citronade",
+    "price": 1.99
+  },
+  {
+    "id": "urn:ngsi-ld:Product:011",
+    "type": "Product",
+    "name": "Boisson au Chocolat",
+    "price": 1.99
+  },
+  {
+    "id": "urn:ngsi-ld:Product:012",
+    "type": "Product",
+    "name": "Boisson au lait a la vanille",
+    "price": 2.9
+  },
+  {
+    "id": "urn:ngsi-ld:Product:001",
+    "type": "Product"
+  }
 ]
+
 ```
 
-Full context data for a specified entity type can be retrieved by making a GET request to the `/v2/entities` endpoint
-and supplying the `type` parameter, combine this with the `options=keyValues` parameter and the `attrs` parameter to
-retrieve key-values.
+Full context data for a specified entity type can be retrieved by making a GET request to the `/v2/entities` endpoint and supplying the `type` parameter, combine this with the `options=keyValues` parameter and the `attrs` parameter to retrieve key-values.
 
 ### List Data Entity by type
 
@@ -789,7 +733,7 @@ This example lists the `id` and `type` of all **Product** entities.
 
 ```console
 curl -X GET \
-  --url 'http://localhost:1026/v2/entities/?type=Product&options=count&attrs=__NONE'
+  --url 'http://localhost:1026/v2/entities/?type=Product&options=count&attrs=__NONE'|jq
 ```
 
 #### Response:
@@ -799,60 +743,26 @@ contain twelve products.
 
 ```json
 [
-    {
-        "id": "urn:ngsi-ld:Product:001",
-        "type": "Product"
-    },
-    {
-        "id": "urn:ngsi-ld:Product:002",
-        "type": "Product"
-    },
-    {
-        "id": "urn:ngsi-ld:Product:003",
-        "type": "Product"
-    },
-    {
-        "id": "urn:ngsi-ld:Product:004",
-        "type": "Product"
-    },
-    {
-        "id": "urn:ngsi-ld:Product:005",
-        "type": "Product"
-    },
-    {
-        "id": "urn:ngsi-ld:Product:006",
-        "type": "Product"
-    },
-    {
-        "id": "urn:ngsi-ld:Product:007",
-        "type": "Product"
-    },
-    {
-        "id": "urn:ngsi-ld:Product:008",
-        "type": "Product"
-    },
-    {
-        "id": "urn:ngsi-ld:Product:009",
-        "type": "Product"
-    },
-    {
-        "id": "urn:ngsi-ld:Product:010",
-        "type": "Product"
-    },
-    {
-        "id": "urn:ngsi-ld:Product:011",
-        "type": "Product"
-    },
-    {
-        "id": "urn:ngsi-ld:Product:012",
-        "type": "Product"
-    }
+  {
+    "id": "urn:ngsi-ld:Product:010",
+    "type": "Product"
+  },
+  {
+    "id": "urn:ngsi-ld:Product:011",
+    "type": "Product"
+  },
+  {
+    "id": "urn:ngsi-ld:Product:012",
+    "type": "Product"
+  },
+  {
+    "id": "urn:ngsi-ld:Product:001",
+    "type": "Product"
+  }
 ]
 ```
 
-Context data for a specified entity type can be retrieved by making a GET request to the `/v2/entities` endpoint and
-supplying the `type` parameter. Combine this with `options=count` and `attrs=__NONE` to return the `id` attributes of
-the given `type`.
+Context data for a specified entity type can be retrieved by making a GET request to the `/v2/entities` endpoint and supplying the `type` parameter. Combine this with `options=count` and `attrs=__NONE` to return the `id` attributes of the given `type`.
 
 > **Note:** The NGSIv2 specification specifies that `attrs=` has to be a "comma-separated list of attribute names whose
 > data are to be included in the response". `id` and `type` are not allowed to be used as attribute names. If you
@@ -876,7 +786,7 @@ This example updates the value of the price attribute of the Entity with `id=urn
 curl -iX PUT \
   --url 'http://localhost:1026/v2/entities/urn:ngsi-ld:Product:001/attrs/price/value' \
   --header 'Content-Type: text/plain' \
-  --data 89
+  --data 1.89
 ```
 
 Existing attribute values can be altered by making a PUT request to the `/v2/entities/<entity>/attrs/<attribute>/value`
@@ -894,7 +804,7 @@ curl -iX PATCH \
   --url 'http://localhost:1026/v2/entities/urn:ngsi-ld:Product:001/attrs' \
   --header 'Content-Type: application/json' \
   --data ' {
-      "price":{"type":"Integer", "value": 89},
+      "price":{"type":"Integer", "value": 1.89},
       "name": {"type":"Text", "value": "Ale"}
 }'
 ```
