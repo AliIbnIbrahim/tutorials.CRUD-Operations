@@ -30,7 +30,7 @@ The tutorial uses [cUrl](https://ec.haxx.se/) commands throughout, but is also a
 -   [Architecture](#architecture)
 -   [Prerequisites](#prerequisites)
     -   [Docker](#docker)
-    -   [Cygwin](#cygwin)
+    -   [Cygwin to be removed](#cygwin)
 -   [Start Up](#start-up)
 -   [What is CRUD?](#what-is-crud)
     -   [Entity CRUD Operations](#entity-crud-operations)
@@ -152,22 +152,62 @@ Both containers reside on the same network - the Orion Context Broker is listeni
 
 ## Docker
 
-To keep things simple both components will be run using [Docker](https://www.docker.com). **Docker** is a container technology which allows to package each component with its environment and run it in isolation.
+Each tutorial runs all components using [Docker](https://www.docker.com). **Docker** is a container technology which
+allows to different components isolated into their respective environments.
 
 -   To install Docker on Windows follow the instructions [here](https://docs.docker.com/docker-for-windows/)
 -   To install Docker on Mac follow the instructions [here](https://docs.docker.com/docker-for-mac/)
--   To install Docker on Linux follow the instructions [here](https://docs.docker.com/install/)
 
-**Docker Compose** is a tool for defining and running multi-container Docker applications. A [YAML file](https://raw.githubusercontent.com/Fiware/tutorials.Entity-Relationships/master/docker-compose.yml) is used configure the required services for the application. This means all container services can be brought up with a single command. Docker Compose is installed by default as part of Docker for Windows and Docker for Mac, however Linux users will need to follow the instructions found [here](https://docs.docker.com/compose/install/)
+#### Install Docker Engine on Ubuntu
+-   from this  [link](https://docs.docker.com/engine/install/ubuntu/#set-up-the-repository)
+Install using the repository
+Before you install Docker Engine for the first time on a new host machine, you need to set up the Docker repository. Afterward, you can install and update Docker from the repository.
+
+1. Set up the repository:  Update the apt package index and install packages to allow apt to use a repository over HTTPS:
+
+```console
+ sudo apt-get update
+ sudo apt-get install ca-certificates curl gnupg lsb-release
+```
+2. Add Docker’s official GPG key:
+
+```console
+ sudo mkdir -p /etc/apt/keyrings
+ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+```
+3. Use the following command to set up the repository:
+
+```console
+ echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+```
+4. Install Docker Engine
+Update the apt package index:
+
+```console
+sudo apt-get update
+```
+ 
+  Install latest Docker Engine, containerd, and Docker Compose:
+  
+```console
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+```
+
+**Docker Compose** is a tool for defining and running multi-container Docker applications. A series of `*.yaml` files
+are used configure the required services for the application. This means all container services can be brought up in a
+single command. 
 
 You can check your current **Docker** and **Docker Compose** versions using the following commands:
 
 ```console
-docker-compose -v
 docker version
+docker compose version
 ```
 
-Please ensure that you are using Docker version 20.10 or higher and Docker Compose 1.29 or higher and upgrade if necessary.
+Please ensure that you are using Docker version 20.10 or higher and Docker Compose 1.29 or higher and upgrade if
+necessary.
 
 ## Cygwin
 
