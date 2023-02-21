@@ -213,7 +213,7 @@ necessary.
 
 We will start up our services using a simple bash script. Windows users should download [cygwin](http://www.cygwin.com/) to provide a command-line functionality similar to a Linux distribution on Windows.
 
-NB: Cygwin to be remove and replaced by debian package under windows
+NB: Cygwin to be remove and replaced by debian/or ubuntu windows package. 
 
 # Start Up
 
@@ -385,7 +385,7 @@ curl -X GET \
   --url 'http://localhost:1026/v2/entities/urn:ngsi-ld:Product:001?type=Product'
 ```
 
-As you can see there is now a boolean `specialOffer` flag attached to the "Beer" **Product** entity.
+As you can see there is now a boolean `specialOffer` flag attached to the productuct with id n°01 **Product** entity.
 
 ### Batch Create New Data Entities or Attributes
 
