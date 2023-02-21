@@ -30,7 +30,7 @@ The tutorial uses [cUrl](https://ec.haxx.se/) commands throughout, but is also a
 -   [Architecture](#architecture)
 -   [Prerequisites](#prerequisites)
     -   [Docker](#docker)
-    -   [Cygwin](#cygwin)
+    -   [Cygwin to be removed](#cygwin)
 -   [Start Up](#start-up)
 -   [What is CRUD?](#what-is-crud)
     -   [Entity CRUD Operations](#entity-crud-operations)
@@ -68,59 +68,52 @@ The tutorial uses [cUrl](https://ec.haxx.se/) commands throughout, but is also a
 
 # Data Entities
 
-Within the FIWARE platform, an entity represents the state of a physical or conceptual object which exists in the real
-world.
+Within the FIWARE platform, an entity represents the state of a physical or conceptual object which exists in the real world.
 
 ## Entities within a stock management system
 
-Within our simple stock management system, we currently have four entity types. The relationships between our entities
-are defined as shown below:
+Within our simple stock management system, we currently have four entity types. The relationships between our entities are defined as shown below:
 
-![](https://fiware.github.io/tutorials.Entity-Relationships/img/entities.png)
+![](https://github.com/AliIbnIbrahim/tutorials.CRUD-Operations/blob/master/images/entities.png)
 
 -   A **Store** is a real world bricks and mortar building. Stores would have properties such as:
-    -   Store name, e.g. "Checkpoint Markt"
-    -   Address, e.g. "Friedrichstraße 44, 10969 Kreuzberg, Berlin"
+    -   Store name, e.g. "Marche au poisson"
+    -   Address, e.g. "Zone industrielle ain sebaa 20590 Casablanca"
     -   Physical location, e.g. _52.5075 N, 13.3903 E_
 -   A **Shelf** is a real world object to hold items which we wish to sell. Each shelf would have properties such as:
     -   Shelf name, e.g. "Wall Unit"
-    -   Physical location, e.g. _52.5075 N, 13.3903 E_
+    -   Physical location, e.g. _33.6271224 N, -7.511453 E_
     -   Maximum capacity
     -   An association to the store in which the shelf is located
--   A **Product** is defined as something that we sell - it is a conceptual object. Products would have properties such
-    as:
-    -   Product name, e.g. "Vodka"
-    -   Price, e.g. 13.99 Euros
+-   A **Product** is defined as something that we sell - it is a conceptual object. Products would have properties such as:
+    -   Product name, e.g. "Jus Orange"
+    -   Price, e.g. 3.99 Dirhams 
     -   Size, e.g. Small
--   An **Inventory Item** is another conceptual entity, used to associate products, stores, shelves and physical
-    objects. It would have properties such as:
+-   An **Inventory Item** is another conceptual entity, used to associate products, stores, shelves and physical objects. It would have properties such as:
     -   An association to the product being sold
     -   An association to the store in which the product is being sold
     -   An association to the shelf where the product is being displayed
     -   Stock count, i.e. product quantity available in the warehouse
     -   Shelf count, i.e. number of items available on the shelf
 
-As you can see, each of the entities defined above contain some properties which are liable to change. For example,
-product price could change, stock could be sold and the number of items on the shelves would drop.
+As you can see, each of the entities defined above contain some properties which are liable to change. For example, product price could change, stock could be sold and the number of items on the shelves would drop.
 
 # Architecture
 
-This application will only make use of one FIWARE component - the
-[Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/). Using the Orion Context Broker is sufficient for
+This application will only make use of one FIWARE component - the [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/). Using the Orion Context Broker is sufficient for
 an application to qualify as _“Powered by FIWARE”_.
 
-Currently, the Orion Context Broker relies on open source [MongoDB](https://www.mongodb.com/) technology to store the
-context data it manages. Therefore, the architecture will consist of two components:
+Currently, the Orion Context Broker relies on open source [MongoDB](https://www.mongodb.com/) technology to store the context data it manages. Therefore, the architecture will consist of two components:
 
--   The [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/) which will receive requests using
-    [NGSI-v2](https://fiware.github.io/specifications/OpenAPI/ngsiv2)
+-   The [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/) which will receive requests using [NGSI-v2](https://fiware.github.io/specifications/OpenAPI/ngsiv2)
 -   The underlying [MongoDB](https://www.mongodb.com/) database:
     -   Used by the Orion Context Broker to store context information such as data entities, subscriptions and
         registrations
 
 Since the two components interact by means of HTTP requests, they can be containerized and run from exposed ports.
 
-![](https://fiware.github.io/tutorials.CRUD-Operations/img/architecture.png)
+![](https://github.com/AliIbnIbrahim/tutorials.CRUD-Operations/blob/master/images/architecture.png)
+
 
 The necessary configuration information can be seen in the services section of the associated `docker-compose.yml` file:
 
@@ -153,33 +146,64 @@ mongo-db:
         - default
 ```
 
-Both containers reside on the same network - the Orion Context Broker is listening on port `1026` and MongoDB is
-listening on the default port `271071`. For the sake of this tutorial, we have also made the two ports available from
-outside the network so that cUrl or Postman can access them without having to be run from inside the network. The
-command-line initialization should be self explanatory.
+Both containers reside on the same network - the Orion Context Broker is listening on port `1026` and MongoDB is listening on the default port `271071`. For the sake of this tutorial, we have also made the two ports available from outside the network so that cUrl or Postman can access them without having to be run from inside the network. The command-line initialization should be self explanatory.
 
 # Prerequisites
 
 ## Docker
 
-To keep things simple both components will be run using [Docker](https://www.docker.com). **Docker** is a container
-technology which allows to package each component with its environment and run it in isolation.
+Each tutorial runs all components using [Docker](https://www.docker.com). **Docker** is a container technology which
+allows to different components isolated into their respective environments.
 
 -   To install Docker on Windows follow the instructions [here](https://docs.docker.com/docker-for-windows/)
 -   To install Docker on Mac follow the instructions [here](https://docs.docker.com/docker-for-mac/)
--   To install Docker on Linux follow the instructions [here](https://docs.docker.com/install/)
 
-**Docker Compose** is a tool for defining and running multi-container Docker applications. A
-[YAML file](https://raw.githubusercontent.com/Fiware/tutorials.Entity-Relationships/master/docker-compose.yml) is used
-configure the required services for the application. This means all container services can be brought up with a single
-command. Docker Compose is installed by default as part of Docker for Windows and Docker for Mac, however Linux users
-will need to follow the instructions found [here](https://docs.docker.com/compose/install/)
+#### Install Docker Engine on Ubuntu
+-   from this  [link](https://docs.docker.com/engine/install/ubuntu/#set-up-the-repository)
+Install using the repository
+Before you install Docker Engine for the first time on a new host machine, you need to set up the Docker repository. Afterward, you can install and update Docker from the repository.
+
+1. Set up the repository:  Update the apt package index and install packages to allow apt to use a repository over HTTPS:
+
+```console
+ sudo apt-get update
+ sudo apt-get install ca-certificates curl gnupg lsb-release
+```
+2. Add Docker’s official GPG key:
+
+```console
+ sudo mkdir -p /etc/apt/keyrings
+ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+```
+3. Use the following command to set up the repository:
+
+```console
+ echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+```
+4. Install Docker Engine
+Update the apt package index:
+
+```console
+sudo apt-get update
+```
+ 
+  Install latest Docker Engine, containerd, and Docker Compose:
+  
+```console
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+```
+
+**Docker Compose** is a tool for defining and running multi-container Docker applications. A series of `*.yaml` files
+are used configure the required services for the application. This means all container services can be brought up in a
+single command. 
 
 You can check your current **Docker** and **Docker Compose** versions using the following commands:
 
 ```console
-docker-compose -v
 docker version
+docker compose version
 ```
 
 Please ensure that you are using Docker version 20.10 or higher and Docker Compose 1.29 or higher and upgrade if
@@ -187,13 +211,13 @@ necessary.
 
 ## Cygwin
 
-We will start up our services using a simple bash script. Windows users should download [cygwin](http://www.cygwin.com/)
-to provide a command-line functionality similar to a Linux distribution on Windows.
+We will start up our services using a simple bash script. Windows users should download [cygwin](http://www.cygwin.com/) to provide a command-line functionality similar to a Linux distribution on Windows.
+
+NB: Cygwin to be remove and replaced by debian/or ubuntu windows package. 
 
 # Start Up
 
-All services can be initialised from the command-line by running the bash script provided within the repository. Please
-clone the repository and create the necessary images by running the commands as shown below:
+All services can be initialised from the command-line by running the bash script provided within the repository. Please clone the repository and create the necessary images by running the commands as shown below:
 
 ```console
 git clone https://github.com/FIWARE/tutorials.CRUD-Operations.git
@@ -202,6 +226,8 @@ git checkout NGSI-v2
 
 ./services start
 ```
+
+<better explain what is in the ./services script>
 
 This command will also import seed data from the previous
 [Store Finder tutorial](https://github.com/FIWARE/tutorials.Entity-Relationships) on startup.
@@ -214,27 +240,21 @@ This command will also import seed data from the previous
 
 # What is CRUD?
 
-**Create**, **Read**, **Update** and **Delete** are the four basic functions of persistent storage. These operations are
-usually referred to using the acronym **CRUD**. Within a database each of these operations map directly to a series of
-commands, however their relationship with a RESTful API is slightly more complex.
+**Create**, **Read**, **Update** and **Delete** are the four basic functions of persistent storage. These operations are usually referred to using the acronym **CRUD**. Within a database each of these operations map directly to a series of commands, however their relationship with a RESTful API is slightly more complex.
 
-The [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/) uses
-[NGSI-v2](https://fiware.github.io/specifications/OpenAPI/ngsiv2) to manipulate the context data. As a RESTful API,
-requests to manipulate the data held within the context follow the standard conventions found when mapping HTTP verbs to
-CRUD operations.
+The [Orion Context Broker](https://fiware-orion.readthedocs.io/en/latest/) uses [NGSI-v2](https://fiware.github.io/specifications/OpenAPI/ngsiv2) to manipulate the context data. As a RESTful API,
+requests to manipulate the data held within the context follow the standard conventions found when mapping HTTP verbs to CRUD operations.
 
 ## Entity CRUD Operations
 
-For operations where the `<entity-id>` is not yet known within the context, or is unspecified, the `/v2/entities`
-endpoint is used.
+For operations where the `<entity-id>` is not yet known within the context, or is unspecified, the `/v2/entities` endpoint is used.
 
 Once an `<entity-id>` is known within the context, individual data entities can be manipulated using the
 `/v2/entities/<entity-id>` endpoint.
 
 It is recommended that entity identifiers should be URNs following the
 [NGSI-LD specification](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.04.01_60/gs_cim009v010401p.pdf),
-therefore each `id` is a URN which follows a standard format: `urn:ngsi-ld:<entity-type>:<entity-id>`. This helps making
-every `id` in the context data unique.
+therefore each `id` is a URN which follows a standard format: `urn:ngsi-ld:<entity-type>:<entity-id>`. This helps making every `id` in the context data unique.
 
 | HTTP Verb  |                                               `/v2/entities`                                               |                                              `/v2/entities/<entity-id>`                                              |
 | ---------- | :--------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------: |
@@ -272,25 +292,18 @@ A complete list of attribute endpoints can be found in the
 
 ## Batch CRUD Operations
 
-Additionally the Orion Context Broker has a convenience batch operation endpoint `/v2/op/update` to manipulate multiple
-entities in a single operation.
+Additionally the Orion Context Broker has a convenience batch operation endpoint `/v2/op/update` to manipulate multiple entities in a single operation.
 
 Batch operations are always triggered by a POST request where the payload is an object with two properties:
 
 -   `actionType` specifies the kind of action to invoke (e.g. `delete`)
--   `entities` is an array of objects holding the list of entities to update, along with the relevant entity data used
-    to perform the operation.
+-   `entities` is an array of objects holding the list of entities to update, along with the relevant entity data used to perform the operation.
 
 # Example CRUD Operations using FIWARE
 
-The following examples assume that the Orion Context Broker is listening on port 1026 of `localhost`, and the initial
-seed data has been imported from the previous tutorial.
+The following examples assume that the Orion Context Broker is listening on port 1026 of `localhost`, and the initial seed data has been imported from the previous tutorial.
 
-All examples refer to the **Product** entity as defined in the stock management system. CRUD operations will therefore
-relate to adding, reading, amending and deleting a product or series of products. This is a typical use case for a store
-regional manager, for example setting prices and deciding what products can be sold. The actual responses you receive in
-each case will depend on the state of the context data in your system at the time. If you find that you have already
-deleted an entity by mistake, you can restore the initial context by reloading the data from the command-line
+All examples refer to the **Product** entity as defined in the stock management system. CRUD operations will therefore relate to adding, reading, amending and deleting a product or series of products. This is a typical use case for a store regional manager, for example setting prices and deciding what products can be sold. The actual responses you receive in each case will depend on the state of the context data in your system at the time. If you find that you have already deleted an entity by mistake, you can restore the initial context by reloading the data from the command-line
 
 ```console
 ./import-data
@@ -311,7 +324,7 @@ operation fails.
 
 ### Create a New Data Entity
 
-This example adds a new **Product** entity ("Lemonade" at 99 cents) to the context.
+This example adds a new **Product** entity ("Citronade" at 1.99 dirhams) to the context.
 
 #### :one: Request:
 
@@ -321,9 +334,9 @@ curl -iX POST \
   --header 'Content-Type: application/json' \
   --data ' {
       "id":"urn:ngsi-ld:Product:010", "type":"Product",
-      "name":{"type":"Text", "value":"Lemonade"},
+      "name":{"type":"Text", "value":"Citronade"},
       "size":{"type":"Text", "value": "S"},
-      "price":{"type":"Integer", "value": 99}
+      "price":{"type":"Integer", "value": 1.99}
 }'
 ```
 
@@ -337,7 +350,7 @@ You can check to see if the new **Product** can be found in the context by makin
 
 ```console
 curl -X GET \
-  --url 'http://localhost:1026/v2/entities/urn:ngsi-ld:Product:010?type=Product'
+  --url 'http://localhost:1026/v2/entities/urn:ngsi-ld:Product:010?type=Product'|jq
 ```
 
 ### Create a New Attribute
@@ -372,12 +385,11 @@ curl -X GET \
   --url 'http://localhost:1026/v2/entities/urn:ngsi-ld:Product:001?type=Product'
 ```
 
-As you can see there is now a boolean `specialOffer` flag attached to the "Beer" **Product** entity.
+As you can see there is now a boolean `specialOffer` flag attached to the productuct with id n°01 **Product** entity.
 
 ### Batch Create New Data Entities or Attributes
 
-This example uses the convenience batch processing endpoint to add two new **Product** entities and one new attribute
-(`offerPrice`) to the context.
+This example uses the convenience batch processing endpoint to add two new **Product** entities and one new attribute (`offerPrice`) to the context.
 
 #### :five: Request:
 
@@ -390,19 +402,19 @@ curl -iX POST \
   "entities":[
     {
       "id":"urn:ngsi-ld:Product:011", "type":"Product",
-      "name":{"type":"Text", "value":"Brandy"},
+      "name":{"type":"Text", "value":"Boisson au Chocolat"},
       "size":{"type":"Text", "value": "M"},
-      "price":{"type":"Integer", "value": 1199}
+      "price":{"type":"Integer", "value": 1.99}
     },
     {
       "id":"urn:ngsi-ld:Product:012", "type":"Product",
-      "name":{"type":"Text", "value":"Port"},
+      "name":{"type":"Text", "value":"Boisson au lait a la vanille"},
       "size":{"type":"Text", "value": "M"},
-      "price":{"type":"Integer", "value": 1099}
+      "price":{"type":"Integer", "value": 2.90}
     },
     {
       "id":"urn:ngsi-ld:Product:001", "type":"Product",
-      "offerPrice":{"type":"Integer", "value": 89}
+      "offerPrice":{"type":"Integer", "value": 0.89}
     }
   ]
 }'
@@ -437,15 +449,15 @@ curl -iX POST \
   "entities":[
     {
       "id":"urn:ngsi-ld:Product:011", "type":"Product",
-      "name":{"type":"Text", "value":"Brandy"},
+      "name":{"type":"Text", "value":"Boisson au Chocolat"},
       "size":{"type":"Text", "value": "M"},
-      "price":{"type":"Integer", "value": 1199}
+      "price":{"type":"Integer", "value": 1.99}
     },
     {
       "id":"urn:ngsi-ld:Product:012", "type":"Product",
-      "name":{"type":"Text", "value":"Port"},
+      "name":{"type":"Text", "value":"Boisson au lait a la vanille"},
       "size":{"type":"Text", "value": "M"},
-      "price":{"type":"Integer", "value": 1099}
+      "price":{"type":"Integer", "value": 2.90}
     }
   ]
 }'
@@ -477,7 +489,7 @@ This example reads the full context from an existing **Product** entity with a k
 
 ```console
 curl -X GET \
-  --url 'http://localhost:1026/v2/entities/urn:ngsi-ld:Product:010?type=Product'
+  --url 'http://localhost:1026/v2/entities/urn:ngsi-ld:Product:010?type=Product'|jq
 ```
 
 #### Response:
@@ -486,11 +498,23 @@ Product `urn:ngsi-ld:Product:010` is "Lemonade" at 99 cents. The response is sho
 
 ```json
 {
-    "id": "urn:ngsi-ld:Product:010",
-    "type": "Product",
-    "name": { "type": "Text", "value": "Lemonade", "metadata": {} },
-    "price": { "type": "Integer", "value": 99, "metadata": {} },
-    "size": { "type": "Text", "value": "S", "metadata": {} }
+  "id": "urn:ngsi-ld:Product:010",
+  "type": "Product",
+  "name": {
+    "type": "Text",
+    "value": "Citronade",
+    "metadata": {}
+  },
+  "price": {
+    "type": "Integer",
+    "value": 1.99,
+    "metadata": {}
+  },
+  "size": {
+    "type": "Text",
+    "value": "S",
+    "metadata": {}
+  }
 }
 ```
 
@@ -504,15 +528,15 @@ This example reads the value of a single attribute (`name`) from an existing **P
 
 ```console
 curl -X GET \
-  --url 'http://localhost:1026/v2/entities/urn:ngsi-ld:Product:001/attrs/name/value'
+  --url 'http://localhost:1026/v2/entities/urn:ngsi-ld:Product:001/attrs/name/value'|jq
 ```
 
 #### Response:
 
-Product `urn:ngsi-ld:Product:001` is "Beer" at 99 cents. The response is shown below:
+Product `urn:ngsi-ld:Product:001` is "Jus Orange" at 1.99 Dirham. The response is shown below:
 
 ```json
-"Beer"
+"Jus Orange"
 ```
 
 Context data can be retrieved by making a GET request to the `/v2/entities/<entity>/attrs/<attribute>/value` endpoint.
@@ -526,19 +550,19 @@ entities with a known `id`.
 
 ```console
 curl -X GET \
-  --url 'http://localhost:1026/v2/entities/urn:ngsi-ld:Product:001?type=Product&options=keyValues&attrs=name,price'
+  --url 'http://localhost:1026/v2/entities/urn:ngsi-ld:Product:001?type=Product&options=keyValues&attrs=name,price'|jq
 ```
 
 #### Response:
 
-Product `urn:ngsi-ld:Product:001` is "Beer" at 99 cents. The response is shown below:
+Product `urn:ngsi-ld:Product:001` is "Jus Orange" at 1.99 Dirham. The response is shown below:
 
 ```json
 {
     "id": "urn:ngsi-ld:Product:001",
     "type": "Product",
-    "name": "Beer",
-    "price": 99
+    "name": "Jus Orange",
+    "price": 1.99
 }
 ```
 
@@ -558,10 +582,10 @@ curl -X GET \
 
 #### Response:
 
-Product `urn:ngsi-ld:Product:001` is "Beer" at 99 cents. The response is shown below:
+Product `urn:ngsi-ld:Product:001` is "Jus Orange" at 99 cents. The response is shown below:
 
 ```json
-["Beer", 99]
+["Jus Orange", 99]
 ```
 
 Combine the `options=values` parameter and the `attrs` parameter to return a list of values in an array.
@@ -574,7 +598,7 @@ This example lists the full context of all **Product** entities.
 
 ```console
 curl -X GET \
-  --url 'http://localhost:1026/v2/entities?type=Product'
+  --url 'http://localhost:1026/v2/entities?type=Product'|jq
 ```
 
 ### Response:
@@ -583,93 +607,74 @@ On start-up the context held nine products, three more have been added by create
 contain twelve products.
 
 ```json
+
 [
-    {
-        "id": "urn:ngsi-ld:Product:001",
-        "type": "Product",
-        "name": { "type": "Text", "value": "Beer", "metadata": {} },
-        "offerPrice": { "type": "Integer", "value": 89, "metadata": {} },
-        "price": { "type": "Integer", "value": 99, "metadata": {} },
-        "size": { "type": "Text", "value": "S", "metadata": {} },
-        "specialOffer": { "type": "Boolean", "value": true, "metadata": {} }
+  {
+    "id": "urn:ngsi-ld:Product:010",
+    "type": "Product",
+    "name": {
+      "type": "Text",
+      "value": "Citronade",
+      "metadata": {}
     },
-    {
-        "id": "urn:ngsi-ld:Product:002",
-        "type": "Product",
-        "name": { "type": "Text", "value": "Red Wine", "metadata": {} },
-        "price": { "type": "Integer", "value": 1099, "metadata": {} },
-        "size": { "type": "Text", "value": "M", "metadata": {} }
+    "price": {
+      "type": "Integer",
+      "value": 1.99,
+      "metadata": {}
     },
-    {
-        "id": "urn:ngsi-ld:Product:003",
-        "type": "Product",
-        "name": { "type": "Text", "value": "White Wine", "metadata": {} },
-        "price": { "type": "Integer", "value": 1499, "metadata": {} },
-        "size": { "type": "Text", "value": "M", "metadata": {} }
-    },
-    {
-        "id": "urn:ngsi-ld:Product:004",
-        "type": "Product",
-        "name": { "type": "Text", "value": "Vodka", "metadata": {} },
-        "price": { "type": "Integer", "value": 5000, "metadata": {} },
-        "size": { "type": "Text", "value": "XL", "metadata": {} }
-    },
-    {
-        "id": "urn:ngsi-ld:Product:005",
-        "type": "Product",
-        "name": { "type": "Text", "value": "Lager", "metadata": {} },
-        "price": { "type": "Integer", "value": 99, "metadata": {} },
-        "size": { "type": "Text", "value": "S", "metadata": {} }
-    },
-    {
-        "id": "urn:ngsi-ld:Product:006",
-        "type": "Product",
-        "name": { "type": "Text", "value": "Whisky", "metadata": {} },
-        "price": { "type": "Integer", "value": 99, "metadata": {} },
-        "size": { "type": "Text", "value": "S", "metadata": {} }
-    },
-    {
-        "id": "urn:ngsi-ld:Product:007",
-        "type": "Product",
-        "name": { "type": "Text", "value": "Gin", "metadata": {} },
-        "price": { "type": "Integer", "value": 99, "metadata": {} },
-        "size": { "type": "Text", "value": "S", "metadata": {} }
-    },
-    {
-        "id": "urn:ngsi-ld:Product:008",
-        "type": "Product",
-        "name": { "type": "Text", "value": "Apple Juice", "metadata": {} },
-        "price": { "type": "Integer", "value": 99, "metadata": {} },
-        "size": { "type": "Text", "value": "S", "metadata": {} }
-    },
-    {
-        "id": "urn:ngsi-ld:Product:009",
-        "type": "Product",
-        "name": { "type": "Text", "value": "Orange Juice", "metadata": {} },
-        "price": { "type": "Integer", "value": 99, "metadata": {} },
-        "size": { "type": "Text", "value": "S", "metadata": {} }
-    },
-    {
-        "id": "urn:ngsi-ld:Product:010",
-        "type": "Product",
-        "name": { "type": "Text", "value": "Lemonade", "metadata": {} },
-        "price": { "type": "Integer", "value": 99, "metadata": {} },
-        "size": { "type": "Text", "value": "S", "metadata": {} }
-    },
-    {
-        "id": "urn:ngsi-ld:Product:011",
-        "type": "Product",
-        "name": { "type": "Text", "value": "Brandy", "metadata": {} },
-        "price": { "type": "Integer", "value": 1199, "metadata": {} },
-        "size": { "type": "Text", "value": "M", "metadata": {} }
-    },
-    {
-        "id": "urn:ngsi-ld:Product:012",
-        "type": "Product",
-        "name": { "type": "Text", "value": "Port", "metadata": {} },
-        "price": { "type": "Integer", "value": 1099, "metadata": {} },
-        "size": { "type": "Text", "value": "M", "metadata": {} }
+    "size": {
+      "type": "Text",
+      "value": "S",
+      "metadata": {}
     }
+  },
+  {
+    "id": "urn:ngsi-ld:Product:011",
+    "type": "Product",
+    "name": {
+      "type": "Text",
+      "value": "Boisson au Chocolat",
+      "metadata": {}
+    },
+    "price": {
+      "type": "Integer",
+      "value": 1.99,
+      "metadata": {}
+    },
+    "size": {
+      "type": "Text",
+      "value": "M",
+      "metadata": {}
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Product:012",
+    "type": "Product",
+    "name": {
+      "type": "Text",
+      "value": "Boisson au lait a la vanille",
+      "metadata": {}
+    },
+    "price": {
+      "type": "Integer",
+      "value": 2.9,
+      "metadata": {}
+    },
+    "size": {
+      "type": "Text",
+      "value": "M",
+      "metadata": {}
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:Product:001",
+    "type": "Product",
+    "offerPrice": {
+      "type": "Integer",
+      "value": 0.89,
+      "metadata": {}
+    }
+  }
 ]
 ```
 
@@ -681,7 +686,7 @@ This example lists the `name` and `price` attributes of all **Product** entities
 
 ```console
 curl -X GET \
-  --url 'http://localhost:1026/v2/entities/?type=Product&options=keyValues&attrs=name,price'
+  --url 'http://localhost:1026/v2/entities/?type=Product&options=keyValues&attrs=name,price'|jq
 ```
 
 #### Response:
@@ -690,85 +695,35 @@ On start-up the context held nine products, three more have been added by create
 contain twelve products.
 
 ```json
+
 [
-    {
-        "id": "urn:ngsi-ld:Product:001",
-        "type": "Product",
-        "name": "Beer",
-        "price": 99
-    },
-    {
-        "id": "urn:ngsi-ld:Product:002",
-        "type": "Product",
-        "name": "Red Wine",
-        "price": 1099
-    },
-    {
-        "id": "urn:ngsi-ld:Product:003",
-        "type": "Product",
-        "name": "White Wine",
-        "price": 1499
-    },
-    {
-        "id": "urn:ngsi-ld:Product:004",
-        "type": "Product",
-        "name": "Vodka",
-        "price": 5000
-    },
-    {
-        "id": "urn:ngsi-ld:Product:005",
-        "type": "Product",
-        "name": "Lager",
-        "price": 99
-    },
-    {
-        "id": "urn:ngsi-ld:Product:006",
-        "type": "Product",
-        "name": "Whisky",
-        "price": 99
-    },
-    {
-        "id": "urn:ngsi-ld:Product:007",
-        "type": "Product",
-        "name": "Gin",
-        "price": 99
-    },
-    {
-        "id": "urn:ngsi-ld:Product:008",
-        "type": "Product",
-        "name": "Apple Juice",
-        "price": 99
-    },
-    {
-        "id": "urn:ngsi-ld:Product:009",
-        "type": "Product",
-        "name": "Orange Juice",
-        "price": 99
-    },
-    {
-        "id": "urn:ngsi-ld:Product:010",
-        "type": "Product",
-        "name": "Lemonade",
-        "price": 99
-    },
-    {
-        "id": "urn:ngsi-ld:Product:011",
-        "type": "Product",
-        "name": "Brandy",
-        "price": 1199
-    },
-    {
-        "id": "urn:ngsi-ld:Product:012",
-        "type": "Product",
-        "name": "Port",
-        "price": 1099
-    }
+  {
+    "id": "urn:ngsi-ld:Product:010",
+    "type": "Product",
+    "name": "Citronade",
+    "price": 1.99
+  },
+  {
+    "id": "urn:ngsi-ld:Product:011",
+    "type": "Product",
+    "name": "Boisson au Chocolat",
+    "price": 1.99
+  },
+  {
+    "id": "urn:ngsi-ld:Product:012",
+    "type": "Product",
+    "name": "Boisson au lait a la vanille",
+    "price": 2.9
+  },
+  {
+    "id": "urn:ngsi-ld:Product:001",
+    "type": "Product"
+  }
 ]
+
 ```
 
-Full context data for a specified entity type can be retrieved by making a GET request to the `/v2/entities` endpoint
-and supplying the `type` parameter, combine this with the `options=keyValues` parameter and the `attrs` parameter to
-retrieve key-values.
+Full context data for a specified entity type can be retrieved by making a GET request to the `/v2/entities` endpoint and supplying the `type` parameter, combine this with the `options=keyValues` parameter and the `attrs` parameter to retrieve key-values.
 
 ### List Data Entity by type
 
@@ -778,7 +733,7 @@ This example lists the `id` and `type` of all **Product** entities.
 
 ```console
 curl -X GET \
-  --url 'http://localhost:1026/v2/entities/?type=Product&options=count&attrs=__NONE'
+  --url 'http://localhost:1026/v2/entities/?type=Product&options=count&attrs=__NONE'|jq
 ```
 
 #### Response:
@@ -788,60 +743,26 @@ contain twelve products.
 
 ```json
 [
-    {
-        "id": "urn:ngsi-ld:Product:001",
-        "type": "Product"
-    },
-    {
-        "id": "urn:ngsi-ld:Product:002",
-        "type": "Product"
-    },
-    {
-        "id": "urn:ngsi-ld:Product:003",
-        "type": "Product"
-    },
-    {
-        "id": "urn:ngsi-ld:Product:004",
-        "type": "Product"
-    },
-    {
-        "id": "urn:ngsi-ld:Product:005",
-        "type": "Product"
-    },
-    {
-        "id": "urn:ngsi-ld:Product:006",
-        "type": "Product"
-    },
-    {
-        "id": "urn:ngsi-ld:Product:007",
-        "type": "Product"
-    },
-    {
-        "id": "urn:ngsi-ld:Product:008",
-        "type": "Product"
-    },
-    {
-        "id": "urn:ngsi-ld:Product:009",
-        "type": "Product"
-    },
-    {
-        "id": "urn:ngsi-ld:Product:010",
-        "type": "Product"
-    },
-    {
-        "id": "urn:ngsi-ld:Product:011",
-        "type": "Product"
-    },
-    {
-        "id": "urn:ngsi-ld:Product:012",
-        "type": "Product"
-    }
+  {
+    "id": "urn:ngsi-ld:Product:010",
+    "type": "Product"
+  },
+  {
+    "id": "urn:ngsi-ld:Product:011",
+    "type": "Product"
+  },
+  {
+    "id": "urn:ngsi-ld:Product:012",
+    "type": "Product"
+  },
+  {
+    "id": "urn:ngsi-ld:Product:001",
+    "type": "Product"
+  }
 ]
 ```
 
-Context data for a specified entity type can be retrieved by making a GET request to the `/v2/entities` endpoint and
-supplying the `type` parameter. Combine this with `options=count` and `attrs=__NONE` to return the `id` attributes of
-the given `type`.
+Context data for a specified entity type can be retrieved by making a GET request to the `/v2/entities` endpoint and supplying the `type` parameter. Combine this with `options=count` and `attrs=__NONE` to return the `id` attributes of the given `type`.
 
 > **Note:** The NGSIv2 specification specifies that `attrs=` has to be a "comma-separated list of attribute names whose
 > data are to be included in the response". `id` and `type` are not allowed to be used as attribute names. If you
@@ -865,7 +786,7 @@ This example updates the value of the price attribute of the Entity with `id=urn
 curl -iX PUT \
   --url 'http://localhost:1026/v2/entities/urn:ngsi-ld:Product:001/attrs/price/value' \
   --header 'Content-Type: text/plain' \
-  --data 89
+  --data 1.89
 ```
 
 Existing attribute values can be altered by making a PUT request to the `/v2/entities/<entity>/attrs/<attribute>/value`
@@ -883,7 +804,7 @@ curl -iX PATCH \
   --url 'http://localhost:1026/v2/entities/urn:ngsi-ld:Product:001/attrs' \
   --header 'Content-Type: application/json' \
   --data ' {
-      "price":{"type":"Integer", "value": 89},
+      "price":{"type":"Integer", "value": 1.89},
       "name": {"type":"Text", "value": "Ale"}
 }'
 ```
